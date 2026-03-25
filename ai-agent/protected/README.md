@@ -23,7 +23,7 @@ The exact same AI agent as the [vanilla version](../vanilla/), now secured with 
 The agent needs a `client_id` to pull delegation tokens:
 
 1. **Sign up** at [app.authsec.ai](https://app.authsec.ai) (free)
-2. **Register an AI Agent client** — go to Delegation > AI Agents in the dashboard
+2. **Register an AI Agent client** — go to mcp server/AI agents > AI Agents in the dashboard
 3. **Copy the Client ID** — it's a UUID like `a1b2c3d4-e5f6-7890-abcd-ef1234567890`
 4. **Delegate a token** — an admin must delegate a token to this `client_id` with the desired permissions (e.g. `posts:read`, `posts:write`, `posts:delete`)
 
@@ -111,7 +111,7 @@ authsec init                         # Path 1: interactive setup (creates .auths
 # cp .env.example .env               # Path 2: manual .env (edit AUTHSEC_CLIENT_ID)
 
 # 3. Run the agent
-python agent.py
+python voice_agent.py
 ```
 
 ---

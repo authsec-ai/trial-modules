@@ -87,6 +87,29 @@ client_id (required): a1b2c3d4-e5f6-7890-abcd-ef1234567890
 Config saved to /path/to/mcp-server/protected/.authsec.json
 ```
 
+> **Troubleshooting: `authsec: command not found`**
+>
+> If `authsec init` fails after installing the SDK, pip likely installed the binary to a directory not on your PATH. You'll see a warning like:
+>
+> ```
+> WARNING: The script authsec is installed in '/Users/<you>/Library/Python/3.11/bin' which is not on PATH.
+> ```
+>
+> **Quick fix** — run it with the full path:
+> ```bash
+> /Users/<you>/Library/Python/3.11/bin/authsec init
+> ```
+>
+> **Permanent fix** — add the directory to your PATH. Add this line to your `~/.zshrc` (or `~/.bashrc`):
+> ```bash
+> export PATH="$PATH:$HOME/Library/Python/3.11/bin"
+> ```
+> Then reload your shell:
+> ```bash
+> source ~/.zshrc
+> ```
+> After that, `authsec init` will work directly.
+
 This creates `.authsec.json` in the current directory. The SDK **automatically reads it** at startup — no code changes needed, no `.env` file required.
 
 If you choose "custom" instead of "default", the CLI prompts you for each URL individually (auth service, services base, CIBA base), letting you point at a self-hosted or staging AuthSec instance.
