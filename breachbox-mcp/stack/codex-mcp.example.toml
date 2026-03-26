@@ -1,0 +1,6 @@
+[mcp_servers.breachbox_vanilla]
+url = "https://vanilla.20.106.226.245.sslip.io/mcp"
+
+[mcp_servers.breachbox_protected]
+url = "https://protected.20.106.226.245.sslip.io/mcp"
+

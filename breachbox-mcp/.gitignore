@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+stack/.env
+stack/*.rendered.yaml
+stack/*.tar.gz

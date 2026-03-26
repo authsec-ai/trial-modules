@@ -1,0 +1,52 @@
+{
+  auto_https disable_redirects
+}
+
+:80 {
+  handle_path /vanilla* {
+    reverse_proxy breachbox-vanilla-mcp:8000 {
+      header_up Host 127.0.0.1:8000
+    }
+  }
+
+  handle_path /protected/mcp* {
+    reverse_proxy breachbox-protected-mcp:8001
+  }
+
+  handle /protected/health {
+    rewrite * /health
+    reverse_proxy breachbox-protected-mcp:8001
+  }
+
+  handle_path /status* {
+    reverse_proxy breachbox-status-ui:8081
+  }
+
+  respond / 200 "BreachBox public gateway is running. Use /vanilla/mcp, /protected/mcp, or /status/."
+}
+
+vanilla.{$PUBLIC_HOST} {
+  handle /mcp* {
+    reverse_proxy breachbox-vanilla-mcp:8000 {
+      header_up Host 127.0.0.1:8000
+    }
+  }
+
+  respond / 200 "BreachBox vanilla MCP is running. Use /mcp."
+}
+
+protected.{$PUBLIC_HOST} {
+  handle_path /mcp* {
+    reverse_proxy breachbox-protected-mcp:8001
+  }
+
+  handle /health {
+    reverse_proxy breachbox-protected-mcp:8001
+  }
+
+  respond / 200 "BreachBox protected MCP is running. Use /mcp."
+}
+
+status.{$PUBLIC_HOST} {
+  reverse_proxy breachbox-status-ui:8081
+}

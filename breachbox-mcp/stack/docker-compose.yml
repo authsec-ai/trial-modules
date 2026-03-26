@@ -1,0 +1,115 @@
+services:
+  breachbox-control-api:
+    image: ${DOCKERHUB_NAMESPACE}/breachbox-control-api:${DEMO_TAG}
+    restart: unless-stopped
+    environment:
+      BREACHBOX_DATA_ROOT: /srv/breachbox-demo
+      BREACHBOX_CONTROL_TOKEN: ${BREACHBOX_CONTROL_TOKEN}
+      BREACHBOX_PRIMARY_EXPORT: ${BREACHBOX_PRIMARY_EXPORT}
+      BREACHBOX_PRIMARY_SECRET: ${BREACHBOX_PRIMARY_SECRET}
+    volumes:
+      - /srv/breachbox-demo:/srv/breachbox-demo
+    networks:
+      - breachbox
+
+  breachbox-worker:
+    image: ${DOCKERHUB_NAMESPACE}/breachbox-worker:${DEMO_TAG}
+    restart: "no"
+    environment:
+      BREACHBOX_DATA_ROOT: /srv/breachbox-demo
+    volumes:
+      - /srv/breachbox-demo:/srv/breachbox-demo
+    networks:
+      - breachbox
+    depends_on:
+      - breachbox-control-api
+
+  breachbox-vanilla-mcp:
+    image: ${DOCKERHUB_NAMESPACE}/breachbox-vanilla-mcp:${DEMO_TAG}
+    restart: unless-stopped
+    environment:
+      MCP_PORT: 8000
+      BREACHBOX_CONTROL_API_URL: http://breachbox-control-api:8080
+      BREACHBOX_CONTROL_TOKEN: ${BREACHBOX_CONTROL_TOKEN}
+      BREACHBOX_PRIMARY_EXPORT: ${BREACHBOX_PRIMARY_EXPORT}
+      BREACHBOX_PRIMARY_SECRET: ${BREACHBOX_PRIMARY_SECRET}
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - breachbox
+    depends_on:
+      - breachbox-control-api
+
+  breachbox-protected-mcp:
+    image: ${DOCKERHUB_NAMESPACE}/breachbox-protected-mcp:${DEMO_TAG}
+    restart: unless-stopped
+    environment:
+      AUTHSEC_PORT: 8001
+      AUTHSEC_CLIENT_ID: ${AUTHSEC_CLIENT_ID}
+      AUTHSEC_APP_NAME: ${AUTHSEC_APP_NAME}
+      AUTHSEC_AUTH_SERVICE_URL: ${AUTHSEC_AUTH_SERVICE_URL}
+      AUTHSEC_SERVICES_URL: ${AUTHSEC_SERVICES_URL}
+      BREACHBOX_CONTROL_API_URL: http://breachbox-control-api:8080
+      BREACHBOX_CONTROL_TOKEN: ${BREACHBOX_CONTROL_TOKEN}
+      BREACHBOX_PRIMARY_EXPORT: ${BREACHBOX_PRIMARY_EXPORT}
+      BREACHBOX_PRIMARY_SECRET: ${BREACHBOX_PRIMARY_SECRET}
+    ports:
+      - "127.0.0.1:8001:8001"
+    networks:
+      - breachbox
+    depends_on:
+      - breachbox-control-api
+
+  breachbox-status-ui:
+    image: ${DOCKERHUB_NAMESPACE}/breachbox-status-ui:${DEMO_TAG}
+    restart: unless-stopped
+    environment:
+      BREACHBOX_CONTROL_API_URL: http://breachbox-control-api:8080
+      BREACHBOX_CONTROL_TOKEN: ${BREACHBOX_CONTROL_TOKEN}
+      BREACHBOX_STATUS_APP_NAME: ${BREACHBOX_STATUS_APP_NAME}
+    ports:
+      - "127.0.0.1:8081:8081"
+    networks:
+      - breachbox
+    depends_on:
+      - breachbox-control-api
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - breachbox
+    depends_on:
+      - breachbox-vanilla-mcp
+      - breachbox-protected-mcp
+      - breachbox-status-ui
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command:
+      - tunnel
+      - --no-autoupdate
+      - --url
+      - http://caddy:80
+    networks:
+      - breachbox
+    depends_on:
+      - caddy
+
+networks:
+  breachbox:
+    name: breachbox-demo
+
+volumes:
+  caddy_data:
+  caddy_config:

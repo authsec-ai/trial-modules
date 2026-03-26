@@ -1,0 +1,5 @@
+[mcp_servers.breachbox_vanilla]
+url = "http://127.0.0.1:9000/mcp"
+
+[mcp_servers.breachbox_protected]
+url = "http://127.0.0.1:9001"

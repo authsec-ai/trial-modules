@@ -1,0 +1,50 @@
+#cloud-config
+package_update: true
+package_upgrade: false
+packages:
+  - curl
+  - ca-certificates
+
+write_files:
+  - path: /root/breachbox-bootstrap.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      export DOCKERHUB_NAMESPACE="__DOCKERHUB_NAMESPACE__"
+      export DEMO_TAG="__DEMO_TAG__"
+      export SKIP_PULL="__SKIP_PULL__"
+      export PUBLIC_HOST="__PUBLIC_HOST__"
+      export AUTHSEC_CLIENT_ID="__AUTHSEC_CLIENT_ID__"
+      export AUTHSEC_APP_NAME="__AUTHSEC_APP_NAME__"
+      export AUTHSEC_AUTH_SERVICE_URL="__AUTHSEC_AUTH_SERVICE_URL__"
+      export AUTHSEC_SERVICES_URL="__AUTHSEC_SERVICES_URL__"
+      export BREACHBOX_CONTROL_TOKEN="__BREACHBOX_CONTROL_TOKEN__"
+      export BREACHBOX_PRIMARY_EXPORT="__BREACHBOX_PRIMARY_EXPORT__"
+      export BREACHBOX_PRIMARY_SECRET="__BREACHBOX_PRIMARY_SECRET__"
+      export BREACHBOX_STATUS_APP_NAME="__BREACHBOX_STATUS_APP_NAME__"
+      export BUNDLE_URL="__BUNDLE_URL__"
+
+      curl -fsSL https://get.docker.com | sh
+      mkdir -p /opt/breachbox-demo
+      curl -fsSL "${BUNDLE_URL}" -o /tmp/breachbox-stack.tar.gz
+      tar -xzf /tmp/breachbox-stack.tar.gz -C /opt/breachbox-demo
+      cat > /opt/breachbox-demo/.env <<EOF
+      DOCKERHUB_NAMESPACE="${DOCKERHUB_NAMESPACE}"
+      DEMO_TAG="${DEMO_TAG}"
+      SKIP_PULL="${SKIP_PULL}"
+      PUBLIC_HOST="${PUBLIC_HOST}"
+      AUTHSEC_CLIENT_ID="${AUTHSEC_CLIENT_ID}"
+      AUTHSEC_APP_NAME="${AUTHSEC_APP_NAME}"
+      AUTHSEC_AUTH_SERVICE_URL="${AUTHSEC_AUTH_SERVICE_URL}"
+      AUTHSEC_SERVICES_URL="${AUTHSEC_SERVICES_URL}"
+      BREACHBOX_CONTROL_TOKEN="${BREACHBOX_CONTROL_TOKEN}"
+      BREACHBOX_PRIMARY_EXPORT="${BREACHBOX_PRIMARY_EXPORT}"
+      BREACHBOX_PRIMARY_SECRET="${BREACHBOX_PRIMARY_SECRET}"
+      BREACHBOX_STATUS_APP_NAME="${BREACHBOX_STATUS_APP_NAME}"
+      EOF
+      chmod 600 /opt/breachbox-demo/.env
+      /opt/breachbox-demo/install.sh
+
+runcmd:
+  - /root/breachbox-bootstrap.sh

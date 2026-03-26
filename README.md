@@ -17,6 +17,7 @@ Run the **vanilla** demos to see how easy it is to exploit unprotected MCP serve
 
 | Demo | Path | What It Shows |
 |------|------|---------------|
+| BreachBox MCP (Docker, VM) | [`breachbox-mcp/`](breachbox-mcp/) | The remote-infrastructure story: the same VM-impacting MCP tools running as vanilla vs AuthSec-protected |
 | MCP Server (Vanilla) | [`mcp-server/vanilla/`](mcp-server/vanilla/) | The problem: every tool is public — anyone can delete notes, read confidential data |
 | MCP Server (Protected) | [`mcp-server/protected/`](mcp-server/protected/) | The fix: tools are hidden until OAuth login, then gated by RBAC roles & scopes |
 | AI Agent (Vanilla) | [`ai-agent/vanilla/`](ai-agent/vanilla/) | The problem: agent has no identity, shared credentials, zero audit trail |
